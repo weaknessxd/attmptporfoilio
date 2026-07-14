@@ -62,7 +62,7 @@
 
   const SOCIALS = [
     { id: 'linkedin', icon: 'linkedin', label: 'Linkedin', href: 'https://www.linkedin.com/in/sergei-gorbachenko-ba36a6270/' },
-    { id: 'telegram', icon: 'telegram', label: 'Telegram', href: 'https://t.me/weaknessxd' },
+    { id: 'telegram', icon: 'telegram', label: 'Telegram', href: 'https://telegram.me/weaknessxd' },
     { id: 'mail', icon: 'mail', label: 'Email', value: 'serega.gorbachenko@gmail.com', copy: true },
   ];
 
