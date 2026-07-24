@@ -45,8 +45,8 @@
   ];
 
   /* Shots — masonry canvas of real works (images + animated GIFs) */
-  const SHOT_IMAGES = Array.from({ length: 56 }, (_, i) => `assets/shots/s${String(i + 1).padStart(2, '0')}.webp`);
-  const SHOT_GIFS   = Array.from({ length: 12 }, (_, i) => `assets/shots/g${String(i + 1).padStart(2, '0')}.gif`);
+  const SHOT_IMAGES = Array.from({ length: 73 }, (_, i) => `assets/shots/s${String(i + 1).padStart(2, '0')}.webp`);
+  const SHOT_GIFS   = Array.from({ length: 13 }, (_, i) => `assets/shots/g${String(i + 1).padStart(2, '0')}.gif`);
   // interleave a gif after roughly every 4 images so animations spread across the grid
   const SHOTS = (() => {
     const out = []; let g = 0;
