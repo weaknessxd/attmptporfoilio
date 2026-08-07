@@ -45,16 +45,37 @@
   ];
 
   /* Shots — masonry canvas of real works (images + animated GIFs) */
-  const SHOT_IMAGES = Array.from({ length: 86 }, (_, i) => `assets/shots/s${String(i + 1).padStart(2, '0')}.webp`);
-  const SHOT_GIFS   = Array.from({ length: 14 }, (_, i) => `assets/shots/g${String(i + 1).padStart(2, '0')}.gif`);
-  // interleave a gif after roughly every 4 images so animations spread across the grid
+  /* aspect ratio (height / width) per file — drives the masonry column balancing */
+  const SHOT_AR = {
+    s01:1.0009, s02:0.5586, s03:1.4286, s04:1.4286, s05:1.4286, s06:1.4286, s07:1, s08:1,
+    s09:1.4286, s10:1, s11:0.6343, s12:1.3336, s13:1, s14:1, s15:2.5, s16:1, s17:1.0984,
+    s18:1.3771, s19:0.7143, s20:0.9864, s21:1.0136, s22:1, s23:1, s24:1, s25:1, s26:1,
+    s27:0.75, s28:1.3336, s29:1.3329, s30:1.3329, s31:1.3329, s32:0.5645, s33:1, s34:1,
+    s35:1, s36:1, s37:1, s38:1.7926, s39:1.7865, s40:0.8919, s41:3.2819, s42:1.3121,
+    s43:1.5014, s44:1, s45:1.66, s46:1.7909, s47:0.5589, s48:1.0012, s49:1, s50:1.0011,
+    s51:0.6614, s52:0.3821, s53:0.87, s54:1.25, s55:1.25, s56:1.5, s57:0.8, s58:0.8672,
+    s59:0.6664, s60:0.6927, s61:1.1807, s62:1, s63:1, s64:1.0961, s65:1.568, s66:1.475,
+    s67:1.475, s68:1.475, s69:1.7779, s70:0.5629, s71:1, s72:1, s73:1.2543, s74:1.4286,
+    s75:0.5693, s76:1.3336, s77:1.1379, s78:0.5457, s79:2.9508, s80:1.4139, s81:1.3336,
+    s82:0.6493, s83:2.1727, s84:1.25, s85:1.29, s86:0.5629, s87:1.475, s88:0.65,
+    s89:1.4864, s90:1.71,
+    g01:1, g02:0.3105, g03:1, g04:1, g05:0.3105, g06:1, g07:0.3158, g08:0.5579,
+    g09:0.2368, g10:1, g11:0.5579, g12:1, g13:0.7526, g14:1.3316,
+  };
+
+  const SHOT_IMAGES = Array.from({ length: 90 }, (_, i) => `s${String(i + 1).padStart(2, '0')}.webp`);
+  const SHOT_GIFS   = Array.from({ length: 14 }, (_, i) => `g${String(i + 1).padStart(2, '0')}.gif`);
+  /* newest first (highest index = most recently added), gifs spread evenly through the grid */
   const SHOTS = (() => {
+    const imgs = [...SHOT_IMAGES].reverse();
+    const gifs = [...SHOT_GIFS].reverse();
+    const every = Math.max(1, Math.round(imgs.length / (gifs.length + 1)));
     const out = []; let g = 0;
-    SHOT_IMAGES.forEach((src, i) => {
-      out.push({ src, gif: false });
-      if ((i + 1) % 4 === 0 && g < SHOT_GIFS.length) out.push({ src: SHOT_GIFS[g++], gif: true });
+    imgs.forEach((name, i) => {
+      out.push({ name, gif: false });
+      if ((i + 1) % every === 0 && g < gifs.length) out.push({ name: gifs[g++], gif: true });
     });
-    while (g < SHOT_GIFS.length) out.push({ src: SHOT_GIFS[g++], gif: true });
+    while (g < gifs.length) out.push({ name: gifs[g++], gif: true });
     return out;
   })();
   const SHOTS_BADGES = ['GRAPHICS', 'LOGOS', 'POSTERS', 'STICKERS'];
@@ -116,14 +137,37 @@
     }).join('');
   }
 
-  /* ---------- shots canvas (masonry) ---------- */
+  /* ---------- shots canvas (masonry) ----------
+     Tiles are dealt into the shortest column, so reading order runs left-to-right:
+     the newest work always lands at the very top of the grid. */
+  function layoutShots() {
+    const canvas = $('.shots-canvas', shotsView);
+    if (!canvas) return;
+    const cols = window.matchMedia('(max-width:1024px)').matches ? 1 : 4;
+    if (canvas.dataset.cols === String(cols)) return;
+    canvas.dataset.cols = cols;
+
+    canvas.innerHTML = '';
+    const colEls = [], heights = Array(cols).fill(0);
+    for (let c = 0; c < cols; c++) {
+      const el = document.createElement('div');
+      el.className = 'shots-col';
+      canvas.appendChild(el);
+      colEls.push(el);
+    }
+    SHOTS.forEach((s, i) => {
+      let c = 0;
+      for (let k = 1; k < cols; k++) if (heights[k] < heights[c]) c = k;
+      heights[c] += SHOT_AR[s.name.split('.')[0]] || 1;
+      colEls[c].insertAdjacentHTML('beforeend',
+        `<div class="shot${s.gif ? ' shot--gif' : ''}" style="animation-delay:${(i % 12) * 0.03}s"><img src="assets/shots/${s.name}" loading="lazy" decoding="async" alt="" /></div>`);
+    });
+  }
+
   function renderShots() {
-    const tiles = SHOTS.map((s, i) =>
-      `<div class="shot${s.gif ? ' shot--gif' : ''}" style="animation-delay:${(i % 12) * 0.03}s"><img src="${s.src}" loading="lazy" decoding="async" alt="" /></div>`
-    ).join('');
     shotsView.innerHTML = `
       <div class="shots-scroll">
-        <div class="shots-canvas">${tiles}</div>
+        <div class="shots-canvas"></div>
       </div>
       <div class="shots-meta">
         <div class="badge-row">${SHOTS_BADGES.map(b => `<span class="badge">${b}</span>`).join('')}</div>
@@ -137,6 +181,7 @@
       metaEl.style.opacity = o;
       metaEl.style.pointerEvents = o < 0.1 ? 'none' : '';
     }, { passive: true });
+    layoutShots();
   }
 
   /* ---------- switch CASES / SHOTS ---------- */
@@ -388,7 +433,8 @@
     const ref = window.innerWidth <= 1024 ? 44 : 192;
     document.documentElement.style.fontSize = (window.innerWidth / ref) + 'px';
   }
-  window.addEventListener('resize', setScale);
+  window.addEventListener('resize', () => { setScale(); layoutShots(); });
+  window.matchMedia('(max-width:1024px)').addEventListener('change', layoutShots);
   setScale();
 
   /* ---------- boot ---------- */
