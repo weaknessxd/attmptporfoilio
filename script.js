@@ -59,11 +59,12 @@
     s75:0.5693, s76:1.3336, s77:1.1379, s78:0.5457, s79:2.9508, s80:1.4139, s81:1.3336,
     s82:0.6493, s83:2.1727, s84:1.25, s85:1.29, s86:0.5629, s87:1.475, s88:0.65,
     s89:1.4864, s90:1.71, s91:1, s92:1.4286, s93:1.1777, s94:1.3079,
+    s95:2.1718, s96:0.4993,
     g01:1, g02:0.3105, g03:1, g04:1, g05:0.3105, g06:1, g07:0.3158, g08:0.5579,
     g09:0.2368, g10:1, g11:0.5579, g12:1, g13:0.7526, g14:1.3316,
   };
 
-  const SHOT_IMAGES = Array.from({ length: 94 }, (_, i) => `s${String(i + 1).padStart(2, '0')}.webp`);
+  const SHOT_IMAGES = Array.from({ length: 96 }, (_, i) => `s${String(i + 1).padStart(2, '0')}.webp`);
   const SHOT_GIFS   = Array.from({ length: 14 }, (_, i) => `g${String(i + 1).padStart(2, '0')}.gif`);
   /* newest first (highest index = most recently added), gifs spread evenly through the grid */
   const SHOTS = (() => {

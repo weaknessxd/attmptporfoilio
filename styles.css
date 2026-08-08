@@ -252,6 +252,33 @@ img { display: block; }
 .social:active .s-icon, .social:active .s-label,
 .social.copied .s-icon, .social.copied .s-label { background: var(--ink); color: var(--white); }
 
+/* ============================================================
+   Editor tool — blurred label on the right, solid on hover
+   ============================================================ */
+.editor-tool {
+  position: absolute; right: 2rem; top: 50%;
+  transform: translateY(-50%);
+  z-index: 20; text-decoration: none;
+}
+.editor-tool .et-label {
+  display: block; padding: .6rem 1.2rem;
+  background: transparent;
+  font-family: 'Inter', sans-serif; font-weight: 400;
+  font-size: 5.8rem; line-height: 1;
+  color: #c7c7c7;
+  filter: blur(.4rem);
+  transition: background .2s var(--ease), color .2s var(--ease), filter .2s var(--ease);
+}
+.editor-tool:hover .et-label {
+  background: var(--ink); color: var(--white); filter: blur(0);
+}
+/* keep the reveal animation from clobbering the vertical centering */
+.editor-tool.reveal { transform: translateY(calc(-50% - 1rem)); }
+.editor-tool.reveal.in { transform: translateY(-50%); }
+
+.app[data-view="shots"] .editor-tool,
+.app:not([data-open=""]) .editor-tool { display: none; }
+
 .social .copied-badge {
   position: absolute; right: 0; top: -1.8rem;
   display: none; align-items: center; gap: .4rem;
@@ -574,8 +601,25 @@ img { display: block; }
   .case-item .ci-body { overflow: hidden; }
   .case-item .ci-cap { overflow: hidden; text-overflow: ellipsis; }
 
-  .about { position: relative; z-index: 20; top: 0; left: 0; margin: auto 1.6rem 0; padding-top: 2.4rem; width: auto; }
-  .socials { position: relative; z-index: 20; top: 0; right: 0; margin: 1.4rem 1.6rem 3.6rem; flex-wrap: wrap; gap: 1.2rem; }
+  .about { position: relative; z-index: 20; top: 0; left: 0; order: 3; margin: 0 1.6rem 0; padding-top: 2.4rem; width: auto; }
+  .socials { position: relative; z-index: 20; top: 0; right: 0; order: 4; margin: 1.4rem 1.6rem 3.6rem; flex-wrap: wrap; gap: 1.2rem; }
+
+  /* editor tool sits just above the about block, flush with the right edge;
+     styled like a social button minus the icon square */
+  .editor-tool {
+    position: relative; right: auto; top: auto;
+    order: 2; align-self: flex-end;
+    margin: auto 1.6rem 0;
+  }
+  .editor-tool.reveal,
+  .editor-tool.reveal.in { transform: none; }
+  .editor-tool .et-label {
+    display: grid; place-items: center; height: 3rem; padding: 0 1.2rem;
+    background: var(--surface); color: var(--dim);
+    font-size: 1.8rem; filter: none;
+  }
+  .editor-tool:hover .et-label { background: var(--surface-hov); color: var(--dim); }
+  .editor-tool:active .et-label { background: var(--ink); color: var(--white); }
 
   /* ---- open mode: full-screen sheet, framed case till bottom ----
      bottom gap to the frame = top gap of the segment control (1.6rem) */
